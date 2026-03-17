@@ -1,0 +1,12 @@
+# All joints start slightly inside their limit boundaries.
+# joint2 [0, pi] and joint3 [-2.967, 0] and gripper_joint1 [0, 0.05] all
+# have 0.0 as a limit — floating-point propagation can produce values like
+# -1e-14 which MoveIt's CheckStartStateBounds would otherwise reject.
+initial_positions:
+  joint1: 0.0
+  joint2: 0.01
+  joint3: -0.01
+  joint4: 0.0
+  joint5: 0.0
+  joint6: 0.0
+  gripper_joint1: 0.001

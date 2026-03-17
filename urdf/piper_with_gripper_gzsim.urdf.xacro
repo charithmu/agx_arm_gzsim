@@ -1,0 +1,25 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro" name="piper">
+
+  <xacro:arg name="initial_positions_file"
+             default="$(find agx_arm_gzsim)/config/initial_positions.yaml"/>
+
+  <!-- Kinematics, visuals, collisions -->
+  <xacro:include
+    filename="$(find agx_arm_description)/agx_arm_urdf/piper/urdf/piper_with_gripper_realsense_description.xacro"/>
+
+  <!-- ros2_control hardware block (GazeboSimSystem) -->
+  <xacro:include filename="$(find agx_arm_gzsim)/urdf/piper_gzsim.ros2_control.xacro"/>
+  <xacro:piper_ros2_control
+    name="GazeboSystem"
+    initial_positions_file="$(arg initial_positions_file)"/>
+
+  <!-- gz_ros2_control plugin: creates controller_manager inside Gazebo -->
+  <gazebo>
+    <plugin filename="gz_ros2_control-system"
+            name="gz_ros2_control::GazeboSimROS2ControlPlugin">
+      <parameters>$(find agx_arm_gzsim)/config/ros2_controllers.yaml</parameters>
+    </plugin>
+  </gazebo>
+
+</robot>
