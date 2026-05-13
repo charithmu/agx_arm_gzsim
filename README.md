@@ -57,7 +57,7 @@ piper_with_gripper_moveit_gzsim.launch.py
 └── rviz2                          (MoveIt MotionPlanning plugin)
 ```
 
-MoveIt reuses the `piper_with_gripper_moveit` package for SRDF, kinematics, and joint limits, with the robot description and controller config overridden for simulation.
+MoveIt reuses the `agx_arm_moveit` package for SRDF, kinematics, and joint limits, with only the trajectory execution config overridden for simulation.
 
 ## Package structure
 

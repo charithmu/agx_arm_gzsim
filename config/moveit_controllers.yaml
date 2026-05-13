@@ -32,3 +32,4 @@ moveit_simple_controller_manager:
     action_ns: follow_joint_trajectory
     joints:
       - gripper_joint1
+      - gripper_joint2

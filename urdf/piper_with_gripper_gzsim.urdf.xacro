@@ -6,7 +6,7 @@
 
   <!-- Kinematics, visuals, collisions -->
   <xacro:include
-    filename="$(find agx_arm_description)/agx_arm_urdf/piper/urdf/piper_with_gripper_realsense_description.xacro"/>
+    filename="$(find agx_arm_description)/agx_arm_urdf/piper/urdf/piper_with_gripper_description.xacro"/>
 
   <!-- ros2_control hardware block (GazeboSimSystem) -->
   <xacro:include filename="$(find agx_arm_gzsim)/urdf/piper_gzsim.ros2_control.xacro"/>
