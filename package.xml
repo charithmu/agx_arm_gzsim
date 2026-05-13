@@ -18,7 +18,7 @@
   <!-- MoveIt config -->
   <exec_depend>agx_arm_moveit</exec_depend>
 
-  <!-- Core ROS2 nodes -->
+  <!-- Core ROS 2 nodes -->
   <exec_depend>robot_state_publisher</exec_depend>
   <exec_depend>xacro</exec_depend>
   <exec_depend>rviz2</exec_depend>

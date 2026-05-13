@@ -11,7 +11,7 @@ Supports standalone visualization and full MoveIt2 motion planning.
 | Gazebo | Harmonic (gz-sim 8) |
 | gz_ros2_control | 1.2+ |
 | `agx_arm_description` | – |
-| `piper_with_gripper_moveit` | – |
+| `agx_arm_moveit` | – |
 
 ## Build
 
