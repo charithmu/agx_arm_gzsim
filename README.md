@@ -32,12 +32,17 @@ ros2 launch agx_arm_gzsim piper_with_gripper_gzsim.launch.py
 Optional arguments:
 - `use_rviz:=false` — skip RViz
 - `gz_args:="-v4"` — pass extra flags to gz sim (e.g. verbose logging)
+- `tcp_offset_xyz:="0 0 0.1358"` — publish `tcp_link` in TF at a fixed offset from `gripper_base`
+- `tcp_offset_rpy:="0 0 0"` — rotate the published `tcp_link` frame if needed
 
 ### With MoveIt2 (Gazebo + move_group + RViz MotionPlanning)
 
 ```bash
 ros2 launch agx_arm_gzsim piper_with_gripper_moveit_gzsim.launch.py
 ```
+
+Optional arguments:
+- `tcp_offset:="[0.0, 0.0, 0.1358, 0.0, 0.0, 0.0]"` — MoveIt TCP offset `[x, y, z, rx, ry, rz]`; defaults to the midpoint between the gripper jaws
 
 In RViz, use the **MotionPlanning** panel to plan and execute trajectories for the `arm` and `gripper` planning groups.
 
@@ -80,5 +85,6 @@ worlds/
 ## Notes
 
 - **Headless display**: if running without a physical display, set `DISPLAY=:1` before launching (or start a virtual framebuffer with `Xvfb :1`).
-- **Initial positions**: `joint2`, `joint3`, and `gripper_joint1` all have `0.0` as a joint limit. They start at `0.01`, `-0.01`, and `0.001` respectively to avoid floating-point boundary violations that prevent MoveIt planning.
+- **Initial positions**: keep the startup pose strictly inside the URDF joint limits. For Piper + gripper, `joint2`, `joint3`, and `gripper_joint1` have `0.0` as one of their hard stops, so they start at `0.01`, `-0.01`, and `0.001` instead of exactly on the boundary.
+- **TCP frame**: Gazebo now publishes `tcp_link` into TF from the sim overlay, with the default offset placed at the midpoint between the gripper jaws (`gripper_base -> tcp_link = [0, 0, 0.1358]`). The MoveIt launch uses the same default offset so planning and TF agree out of the box.
 - **Controllers use position interface**: this matches the Gazebo Harmonic reference setup (e.g. panda) and requires no PID tuning. The `GazeboSimSystem` plugin handles the position-to-effort conversion internally.

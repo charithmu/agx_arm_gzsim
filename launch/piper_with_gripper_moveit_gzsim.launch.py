@@ -19,6 +19,7 @@ Usage
   ros2 launch agx_arm_gzsim piper_with_gripper_moveit_gzsim.launch.py gz_args:="-v4"
 """
 
+import ast
 import sys
 import yaml
 from pathlib import Path
@@ -33,11 +34,7 @@ sys.path.insert(
 from _moveit_config_builder import build_moveit_config  # noqa: E402
 
 from launch import LaunchDescription
-from launch.actions import (
-    DeclareLaunchArgument,
-    IncludeLaunchDescription,
-    OpaqueFunction,
-)
+from launch.actions import DeclareLaunchArgument, IncludeLaunchDescription, OpaqueFunction
 from launch.launch_description_sources import PythonLaunchDescriptionSource
 from launch.substitutions import LaunchConfiguration, PathJoinSubstitution
 from launch_ros.actions import Node
@@ -47,6 +44,29 @@ from launch_ros.substitutions import FindPackageShare
 def _launch_moveit(context):
     pkg_gzsim = get_package_share_directory("agx_arm_gzsim")
     pkg_moveit = get_package_share_directory("agx_arm_moveit")
+    tcp_offset = ast.literal_eval(LaunchConfiguration("tcp_offset").perform(context))
+    tcp_offset_xyz = f"{tcp_offset[0]} {tcp_offset[1]} {tcp_offset[2]}"
+    tcp_offset_rpy = f"{tcp_offset[3]} {tcp_offset[4]} {tcp_offset[5]}"
+
+    sim_launch = IncludeLaunchDescription(
+        PythonLaunchDescriptionSource(
+            [
+                PathJoinSubstitution(
+                    [
+                        FindPackageShare("agx_arm_gzsim"),
+                        "launch",
+                        "piper_with_gripper_gzsim.launch.py",
+                    ]
+                )
+            ]
+        ),
+        launch_arguments={
+            "use_rviz": "false",
+            "gz_args": LaunchConfiguration("gz_args"),
+            "tcp_offset_xyz": tcp_offset_xyz,
+            "tcp_offset_rpy": tcp_offset_rpy,
+        }.items(),
+    )
 
     # All MoveIt config (SRDF, kinematics, planning pipelines, joint limits)
     # comes from agx_arm_moveit via the shared builder – no duplication here.
@@ -66,7 +86,7 @@ def _launch_moveit(context):
             {
                 "use_sim_time": True,
                 # Joints that settle just outside their limit boundary are still valid.
-                "start_state_max_bounds_error": 0.1,
+                "start_state_max_bounds_error": 0.01,
             },
         ],
     )
@@ -87,7 +107,7 @@ def _launch_moveit(context):
         ],
     )
 
-    return [move_group_node, rviz_node]
+    return [sim_launch, move_group_node, rviz_node]
 
 
 def generate_launch_description():
@@ -100,30 +120,13 @@ def generate_launch_description():
             DeclareLaunchArgument("revo2_type", default_value="left"),
             DeclareLaunchArgument(
                 "tcp_offset",
-                default_value="[0.0, 0.0, 0.0, 0.0, 0.0, 0.0]",
-                description="TCP offset [x, y, z, rx, ry, rz] in metres/radians.",
+                default_value="[0.0, 0.0, 0.1358, 0.0, 0.0, 0.0]",
+                description="TCP offset [x, y, z, rx, ry, rz] in metres/radians. Defaults to the midpoint between the gripper jaws.",
             ),
             DeclareLaunchArgument(
                 "gz_args",
                 default_value="",
                 description="Extra arguments forwarded to gz sim (e.g. -v4 for verbose).",
-            ),
-            IncludeLaunchDescription(
-                PythonLaunchDescriptionSource(
-                    [
-                        PathJoinSubstitution(
-                            [
-                                FindPackageShare("agx_arm_gzsim"),
-                                "launch",
-                                "piper_with_gripper_gzsim.launch.py",
-                            ]
-                        )
-                    ]
-                ),
-                launch_arguments={
-                    "use_rviz": "false",
-                    "gz_args": LaunchConfiguration("gz_args"),
-                }.items(),
             ),
             OpaqueFunction(function=_launch_moveit),
         ]

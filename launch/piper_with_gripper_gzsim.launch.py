@@ -4,6 +4,7 @@ Launch the Piper arm + gripper in Gazebo Harmonic (visualization only, no MoveIt
 Usage:
   ros2 launch agx_arm_gzsim piper_with_gripper_gzsim.launch.py
   ros2 launch agx_arm_gzsim piper_with_gripper_gzsim.launch.py use_rviz:=false
+    ros2 launch agx_arm_gzsim piper_with_gripper_gzsim.launch.py tcp_offset_xyz:="0 0 0.1358"
 """
 
 import os
@@ -54,6 +55,16 @@ def generate_launch_description():
         default_value="",
         description="Extra arguments forwarded to gz sim (e.g. -v4 for verbose)",
     )
+    declare_tcp_offset_xyz = DeclareLaunchArgument(
+        "tcp_offset_xyz",
+        default_value="0 0 0.1358",
+        description="Sim TF TCP translation [x y z] from gripper_base in metres.",
+    )
+    declare_tcp_offset_rpy = DeclareLaunchArgument(
+        "tcp_offset_rpy",
+        default_value="0 0 0",
+        description="Sim TF TCP rotation [r p y] from gripper_base in radians.",
+    )
 
     robot_description_content = Command(
         [
@@ -66,6 +77,12 @@ def generate_launch_description():
             PathJoinSubstitution(
                 [FindPackageShare("agx_arm_gzsim"), "config", "initial_positions.yaml"]
             ),
+            " tcp_offset_xyz:='",
+            LaunchConfiguration("tcp_offset_xyz"),
+            "'",
+            " tcp_offset_rpy:='",
+            LaunchConfiguration("tcp_offset_rpy"),
+            "'",
         ]
     )
     robot_description = {
@@ -173,6 +190,8 @@ def generate_launch_description():
             gz_resource_path,
             declare_use_rviz,
             declare_gz_args,
+            declare_tcp_offset_xyz,
+            declare_tcp_offset_rpy,
             rsp_node,
             gz_sim_launch,
             clock_bridge,

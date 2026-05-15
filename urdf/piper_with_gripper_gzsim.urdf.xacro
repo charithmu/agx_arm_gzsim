@@ -3,10 +3,19 @@
 
   <xacro:arg name="initial_positions_file"
              default="$(find agx_arm_gzsim)/config/initial_positions.yaml"/>
+  <xacro:arg name="effector_type" default="agx_gripper"/>
+  <xacro:arg name="revo2_type" default="left"/>
+  <xacro:arg name="tcp_offset_xyz" default="0 0 0.1358"/>
+  <xacro:arg name="tcp_offset_rpy" default="0 0 0"/>
 
-  <!-- Kinematics, visuals, collisions -->
-  <xacro:include
-    filename="$(find agx_arm_description)/agx_arm_urdf/piper/urdf/piper_with_gripper_description.xacro"/>
+  <xacro:include filename="$(find agx_arm_description)/agx_arm_urdf/agx_arm_with_tcp.xacro"/>
+  <xacro:agx_arm_with_tcp
+    arm_type="piper"
+    effector_type="$(arg effector_type)"
+    revo2_type="$(arg revo2_type)"
+    tcp_offset_xyz="$(arg tcp_offset_xyz)"
+    tcp_offset_rpy="$(arg tcp_offset_rpy)"
+  />
 
   <!-- ros2_control hardware block (GazeboSimSystem) -->
   <xacro:include filename="$(find agx_arm_gzsim)/urdf/piper_gzsim.ros2_control.xacro"/>
